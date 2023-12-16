@@ -1,0 +1,14 @@
+#!/bin/sh
+
+[ "$1" = "" ] && thread="$(xclip -selection clipboard -o)" || thread="$1"
+threadnumber=$(echo "$thread" | cut -d/ -f5)
+printf "Thread: $threadnumber\n"
+downdir="${XDG_PICTURES_DIR:-$HOME/pix}/Kpopre/$threadnumber/"
+[ ! -d "$downdir" ] && mkdir -p "$downdir"
+
+urls=$(curl -s "$thread" | grep -oiP "https://up\.kpop\.re/src/\K[^/]+/[^/]+\.(jpg|png|mp4|webm)")
+
+for url in $urls; do
+        aria2c -q -c --allow-overwrite=false --auto-file-renaming=false -d "$downdir" "https://up.kpop.re/src/$url"
+        printf "Downloading $url\n"
+done
