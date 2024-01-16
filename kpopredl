@@ -13,9 +13,9 @@ urls=$(curl -s "$thread" | grep -oiP "https://up\.kpop\.re/src/\K[^/]+/[^/]+\.(j
 
 download_url() {
     url="$1"
-    aria2c -q -c --auto-file-renaming=false --check-certificate=false -d "$downdir" "https://up.kpop.re/src/$url"
+    aria2c -q -c -j 10 --allow-overwrite=false --auto-file-renaming=false --check-certificate=false -d "$downdir" "https://up.kpop.re/src/$url"
     printf "Downloading $url\n"
 }
 
 export -f download_url
-echo "$urls" | parallel download_url
+echo "$urls" | parallel -j 10 download_url
