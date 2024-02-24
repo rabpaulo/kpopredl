@@ -5,17 +5,12 @@
 threadnumber=$(echo "$thread" | cut -d/ -f5)
 printf "Thread: $threadnumber\n"
 
-export downdir="${XDG_PICTURES_DIR:-$HOME/pix}/Kpopre/$threadnumber/"
+export downdir="${XDG_PICTURES_DIR:-$HOME/hd3tb/pics}/Kpopre/$threadnumber/"
 [ ! -d "$downdir" ] && mkdir -p "$downdir"
 
 printf "Caching urls...\n"
-urls=$(curl -s "$thread" | grep -oiP "https://up\.kpop\.re/src/\K[^/]+/[^/]+\.(jpg|png|mp4|webm)")
+cachefile="/tmp/kpopredl$threadnumber"
+curl -s "$thread" | grep -oiP "https://up\.kpop\.re/src/\K[^/]+/[^/]+\.(jpg|png|mp4|webm)" > $cachefile
+sed -i 's/^/https:\/\/up.kpop.re\/src\//g' $cachefile
 
-download_url() {
-    url="$1"
-    aria2c -q -c -j 10 --allow-overwrite=false --auto-file-renaming=false --check-certificate=false -d "$downdir" "https://up.kpop.re/src/$url"
-    printf "Downloading $url\n"
-}
-
-export -f download_url
-echo "$urls" | parallel -j 10 download_url
+aria2c -c -j 16 -x 16 -s 16 -k 1M --allow-overwrite=false --check-certificate=false -d "$downdir" -i $cachefile

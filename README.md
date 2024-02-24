@@ -12,4 +12,3 @@ If you are using Xorg you can just copy the thread url and run ```kpopredl```
 ## Dependencies
 * `curl`
 * `aria2`
-* `parallel`
